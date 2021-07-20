@@ -3,6 +3,7 @@ ipython
 matplotlib>=3.0.3
 scikit-learn>=0.21.3
 anndata==0.7.5
+umap-learn
 git+https://github.com/neurospin-deepinsight/dataify.git
 git+https://github.com/neurospin-deepinsight/brainboard.git
 sphinx==2.2.1
