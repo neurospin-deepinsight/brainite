@@ -50,9 +50,10 @@ learning_rate = 0.001
 beta = 1e-5
 if test:
     reductions = ["pca"]
+    device = torch.device("cpu")
 else:
     reductions = ["tsne", "umap"]
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 #############################################################################

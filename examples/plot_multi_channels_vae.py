@@ -35,7 +35,10 @@ fit_lat_dims = 5
 snr = 10
 adam_lr = 2e-3
 n_epochs = 3 if test else 5000
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if test:
+    device = torch.device("cpu")
+else:
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 ############################################################################
