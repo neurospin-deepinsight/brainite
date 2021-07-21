@@ -42,10 +42,7 @@ batch_size = 64
 dataset_size = 100 if test else 737280
 n_epochs = 30
 adam_lr = 5e-4
-if test:
-    device = torch.device("cpu")
-else:
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 #############################################################################
 # Sprites dataset

@@ -160,6 +160,8 @@ def reconstruct_traverse(model, data, n_per_latent=8, n_latents=None,
         path to save the final image.
     """
     device = data.get_device()
+    if device < 0:
+        device = torch.device("cpu")
     n_latents = n_latents or model.latent_dim
     q = model.encode(data[:n_per_latent])
     dimension_wise_kl_loss = kl_divergence(
