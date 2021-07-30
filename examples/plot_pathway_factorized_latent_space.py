@@ -18,7 +18,6 @@ independence.
 The `test` variable must be set to False to run a full training.
 """
 
-# Imports
 import os
 import sys
 import time

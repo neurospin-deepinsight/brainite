@@ -78,6 +78,6 @@ Complete instructions are available `here
 License
 =======
 
-This project is under the followwing
+This project is under the following
 `LICENSE <https://github.com/neurospin-deepinsight/brainite/blob/master/LICENSE.rst>`_.
 
