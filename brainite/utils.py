@@ -84,7 +84,8 @@ def traverse_line(model, idx, n_samples, data=None, max_traversal=0.475):
     """
     if data is None:
         samples = torch.zeros(n_samples, model.latent_dim)
-        traversals = torch.linspace(*get_traversal_range(), steps=n_samples)
+        traversals = torch.linspace(*get_traversal_range(
+            max_traversal=max_traversal), steps=n_samples)
     else:
         if data.size(dim=0) > 1:
             raise ValueError(
@@ -96,12 +97,14 @@ def traverse_line(model, idx, n_samples, data=None, max_traversal=0.475):
         post_mean_idx = posterior.loc.cpu()[0, idx]
         post_std_idx = posterior.scale.cpu()[0, idx]
         traversals = torch.linspace(*get_traversal_range(
-            mean=post_mean_idx, std=post_std_idx), steps=n_samples)
+            mean=post_mean_idx, std=post_std_idx, max_traversal=max_traversal),
+            steps=n_samples)
     samples[:, idx] = traversals
     return samples
 
 
-def traversals(model, device, data=None, n_per_latent=8, n_latents=None):
+def traversals(model, device, data=None, n_per_latent=8, n_latents=None,
+               max_traversal=0.475):
     """ Plot traverse through all latent dimensions (prior or posterior) one
     by one and plots a grid of images where each row corresponds to a latent
     traversal of one latent dimension.
@@ -121,12 +124,22 @@ def traversals(model, device, data=None, n_per_latent=8, n_latents=None):
     n_latents: int, default None
         the number of latent dimensions to display, i.e. the number of rows.
         If 'None' uses all latents.
+    max_traversal: float, default 0.475
+        the maximum displacement induced by a latent traversal. Symmetrical
+        traversals are assumed. If m >= 0.5 then uses absolute value traversal,
+        if m < 0.5 uses a percentage of the distribution (quantile),
+        e.g. for the prior the distribution is a standard normal so m = 0.45
+        corresponds to an absolute value of 1.645 because 2m = 90% of a
+        standard normal is between -1.645 and 1.645. Note in the case
+        of the posterior, the distribution is not standard normal anymore.
     """
     sampling_type = "prior" if data is None else "posterior"
     n_latents = n_latents or model.latent_dim
     size = (n_latents, n_per_latent)
-    latent_samples = [traverse_line(model, dim, n_per_latent, data=data)
-                      for dim in range(n_latents)]
+    latent_samples = [
+        traverse_line(model, dim, n_per_latent, data=data,
+                      max_traversal=max_traversal)
+        for dim in range(n_latents)]
     latent_samples = torch.cat(latent_samples, dim=0).to(device)
     decoded_traversal = model.p_to_prediction(model.decode(latent_samples))
     n_images, *img_shape = decoded_traversal.shape
