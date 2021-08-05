@@ -87,7 +87,8 @@ sphinx_gallery_conf = {
     "doc_module": "brainite",
     "backreferences_dir": os.path.join("brainite", "gallery"),
     "examples_dirs": os.path.join(os.pardir, "examples"),
-    "gallery_dirs": "auto_gallery"}
+    "gallery_dirs": "auto_gallery",
+    "reference_url": {"brainite": None}}
 
 # Remove some numpy-linked warnings
 numpydoc_show_class_members = False
