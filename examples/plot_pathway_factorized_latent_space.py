@@ -42,7 +42,7 @@ test = True
 datasetdir = "/tmp/kang"
 if not os.path.isdir(datasetdir):
     os.mkdir(datasetdir)
-batch_size = 256
+batch_size = 10 if test else 256
 latent_dim = 4
 n_epochs = 3 if test else 1200
 learning_rate = 0.001
@@ -62,14 +62,20 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 ds_train = SingleCellRNASeqDataset(root=datasetdir, train=True, seed=0)
 ds_val = SingleCellRNASeqDataset(root=datasetdir, train=False, seed=0)
+var_names = ds_val.data["var_names"]
+membership_mask = pd.DataFrame(
+    ds_train.data["membership_mask"], index=ds_train.data["membership_index"],
+    columns=ds_train.data["membership_columns"])
+if test:
+    ds_train = torch.utils.data.random_split(
+        ds_train, [100, len(ds_train) - 100])[0]
+    ds_val = torch.utils.data.random_split(
+        ds_val, [100, len(ds_val) - 100])[0]
 datasets = {"train": ds_train, "val": ds_val}
 dataloaders = {x: torch.utils.data.DataLoader(
     datasets[x], batch_size=batch_size, shuffle=True, num_workers=1)
         for x in ["train", "val"]}
 gtpath = os.path.join(datasetdir, "kang_recons.h5ad")
-membership_mask = pd.DataFrame(
-    ds_train.data["membership_mask"], index=ds_train.data["membership_index"],
-    columns=ds_train.data["membership_columns"])
 print(membership_mask)
 
 #############################################################################
@@ -305,7 +311,7 @@ obs_df.set_index("index", inplace=True)
 print(obs_df)
 recons = anndata.AnnData(
     pd.DataFrame(
-        global_recon, index=obs[:, 0], columns=ds_val.data["var_names"]),
+        global_recon, index=obs[:, 0], columns=var_names),
     obs=obs_df, varm=None)
 recons.obsm["codes"] = pd.DataFrame(
     z, index=obs[:, 0], columns=model.latent_space_names())
