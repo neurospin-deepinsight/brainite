@@ -38,9 +38,9 @@ test = True
 datasetdir = "/tmp/beta_vae_disentangling"
 if not os.path.isdir(datasetdir):
     os.mkdir(datasetdir)
-batch_size = 64
+batch_size = 10 if test else 64
 dataset_size = 100 if test else 737280
-n_epochs = 30
+n_epochs = 3 if test else 30
 adam_lr = 5e-4
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
