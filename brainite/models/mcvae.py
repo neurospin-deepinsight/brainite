@@ -169,7 +169,8 @@ class MCVAE(nn.Module):
             raise NotImplementedError
         return pred
 
-    def apply_threshold(self, z, threshold, keep_dims=True, reorder=False):
+    def apply_threshold(self, z, threshold, keep_dims=True, reorder=False,
+                        ndim=None):
         """ Apply dropout threshold.
 
         Parameters
@@ -182,6 +183,8 @@ class MCVAE(nn.Module):
             dropout lower than threshold is set to 0.
         reorder: bool default False
             reorder dropout rates.
+        ndim: int, default None
+            fix the number of dimensions to keep.
 
         Returns
         -------
@@ -191,6 +194,9 @@ class MCVAE(nn.Module):
         assert(threshold <= 1.0)
         order = torch.argsort(self.dropout).squeeze()
         keep = (self.dropout < threshold).squeeze()
+        if ndim is not None:
+            threshold = np.sort(self.dropout.squeeze())[ndim - 1]
+        keep = (self.dropout <= threshold).squeeze()
         z_keep = []
         for drop in z:
             if keep_dims:
